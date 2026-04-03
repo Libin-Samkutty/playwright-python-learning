@@ -95,6 +95,8 @@ jobs:
           pytest tests/ \
             --browser ${{ matrix.browser }} \
             --numprocesses 2 \
+            --splits 4 \
+            --group ${{ matrix.shard }} \
             --html=reports/html/report-${{ matrix.browser }}-${{ matrix.shard }}.html \
             --self-contained-html \
             --alluredir=reports/allure-results-${{ matrix.browser }}-${{ matrix.shard }} \
