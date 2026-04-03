@@ -1,0 +1,90 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "playwright-test-framework"
+version = "1.0.0"
+description = "Scalable Playwright test framework"
+requires-python = ">=3.9"
+dependencies = [
+    "playwright==1.58.0",
+    "pytest==9.0.2",
+    "pytest-playwright==0.7.2",
+    "pytest-xdist==3.8.0",
+    "filelock==3.25.2",
+    "pytest-html==4.2.0",
+    "allure-pytest==2.15.3",
+    "pytest-rerunfailures>=12.0",
+    "pytest-timeout>=2.2.0",
+    "pytest-cov>=4.1.0",
+    "python-dotenv>=1.0.0",
+    "faker>=21.0.0",
+    "colorlog>=6.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8==6.1.0",
+    "mypy==1.7.1",
+    "black==23.12.0",
+    "isort==5.13.2",
+    "pytest-mock==3.12.0",
+    "mkdocs==1.5.3",
+    "mkdocs-material==9.5.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+python_classes = ["Test*"]
+addopts = "-v --tb=short --strict-markers --showlocals --html=reports/html/report.html --self-contained-html --alluredir=reports/allure-results"
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+markers = [
+    "smoke: Quick sanity tests (run frequently)",
+    "regression: Full regression tests (run before release)",
+    "slow: Tests that take a long time",
+    "login: Tests related to login functionality",
+    "cart: Tests related to shopping cart",
+    "checkout: Tests related to checkout process",
+    "wip: Work in progress (not ready)",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.venv
+    | build
+    | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+known_first_party = ["pages", "tests", "utils", "config", "data"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["pages", "utils"]
+omit = ["tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+]

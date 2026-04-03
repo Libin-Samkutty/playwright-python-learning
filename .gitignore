@@ -1,0 +1,69 @@
+# Python
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+
+venv/
+.venv/
+env/
+.env
+
+# Environment variables
+
+.env.local
+.env.*.local
+
+# Pytest
+
+.pytest_cache/
+.cache/
+
+# Coverage
+
+.coverage
+coverage.xml
+htmlcov/
+
+# Playwright
+
+test-results/
+playwright-report/
+
+# Reports (generated artifacts)
+
+reports/allure-results/
+reports/allure-report/
+reports/html/
+reports/custom/
+
+# Screenshots, traces, videos (captured during runs)
+
+screenshots/
+traces/
+videos/
+artifacts/
+html_dumps/
+
+# IDE
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+
+.DS_Store
+Thumbs.db
+
+# Notes, To-Dos
+notes.md
