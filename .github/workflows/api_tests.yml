@@ -1,0 +1,127 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main , master]
+  # schedule:
+  #   Run daily at 2 AM UTC
+  #   - cron: '0 2 * * *'
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+          playwright install
+      
+      - name: Run API tests
+        run: |
+          pytest tests/api/ \
+            -v \
+            --tb=short \
+            --html=reports/api-report.html \
+            --self-contained-html \
+            -m "not slow"
+        env:
+          CI: true
+      
+      - name: Run contract tests
+        run: |
+          pytest tests/api/test_contract_testing.py -v
+      
+      - name: Run performance tests
+        run: |
+          pytest tests/api/test_performance.py \
+            -v \
+            -m "not slow"
+      
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-test-results-${{ matrix.python-version }}
+          path: reports/
+      
+      - name: Publish test report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: reports/api-report.html
+
+  contract-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install
+      
+      - name: Validate all contracts
+        run: |
+          pytest tests/api/test_contract_testing.py \
+            -v \
+            --tb=short
+      
+      - name: Contract validation report
+        if: failure()
+        run: |
+          echo "Contract validation failed!"
+          echo "Breaking changes detected in API"
+
+  performance-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install
+      
+      - name: Run performance tests
+        run: |
+          pytest tests/api/test_performance.py \
+            -v \
+            --tb=short \
+            -m "not slow"
+      
+      - name: Performance report
+        if: failure()
+        run: |
+          echo "Performance SLA not met!"
